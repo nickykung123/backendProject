@@ -7,7 +7,7 @@ export default function page() {
     return bmi
   }
 
-  console.log(bmiCal(180,60))
+  // console.log(bmiCal(180,60))
   
   return (
     

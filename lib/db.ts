@@ -6,12 +6,13 @@ const connect = () => {
     const connectionState = mongoose.connection.readyState;
 
     if (connectionState === 1) {
-        console.log("connect sucess!");
+        console.log("connect already!");
         return;
     }
 
     if (connectionState === 2) {
         console.log("connecting...")
+        return;
     }
 
     try {
