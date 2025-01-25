@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 
 export default function RegisterForm(){
+    const router = useRouter();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -18,22 +20,23 @@ export default function RegisterForm(){
             return;
         }
 
-        const resExistUser = await fetch('/api/ExistUser',{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({email})
-        }) 
-
-        const { user } = await resExistUser.json();
-
-        if(user){
-            setEmail("This user already exist in database.")
-            return;
-        }
-
+        
         try{
+            const resExistUser = await fetch('/api/ExistUser',{
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({email})
+            }) 
+    
+            const { user } = await resExistUser.json();
+    
+            if(user){
+                setError("This email already exist in database.")
+                return;
+            }
+
             const res = await fetch('/api/register',{
                 method:'POST',
                 headers: {
@@ -50,6 +53,7 @@ export default function RegisterForm(){
 
             const form = e.target
             form.reset();
+            router.push("/")
         }catch(error:any){
             console.log("Error ",error)
         }

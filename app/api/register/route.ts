@@ -5,14 +5,23 @@ import bcrypt from "bcryptjs";
 
 export async function POST(req:Request) {
   try{
-    const {name,email,password} = await req.json();
-    const hashedPassword = await bcrypt.hash(password,10);
     await connectDB();
-    await User.create({name,email,password:hashedPassword})
-
-    return NextResponse.json({message:"Registered succesful."},{status:201})
+    const {name,email,password} = await req.json();
+    const hashPass = await bcrypt.hash(password,10)
+    await User.create({name,email,password:hashPass})
+    return NextResponse.json({message:"user created"},{status:201})
   }catch(error:any){
-    return NextResponse.json({ message: "Your message here" }, { status: 500 });
+    return NextResponse.json({ message: "Error couldn't creat user " + error.message }, { status: 500 });
 
   }
+}
+
+export async function GET(req:Request){
+    try{
+      await connectDB();
+      const users =  await User.find();
+      return NextResponse.json(users,{status:200});
+    }catch(error:any){
+      return NextResponse.json({message:"error in get user" + error.message},{status:500})
+    }
 }
