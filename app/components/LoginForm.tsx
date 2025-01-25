@@ -1,8 +1,40 @@
 "use client";
+
+import { signIn } from "next-auth/react";
 import Link from "next/link";
-import React from "react";
+import { NextResponse } from "next/server";
+import { useState } from "react";
+import { useRouter } from "next/navigation"; 
 
 function login_page() {
+    const router = useRouter();
+    const [email,setEmail] = useState('');
+    const [password,setPassword] = useState('');
+    const [error,setError] = useState('');
+
+    const handleSubmit = async (e:any) => {
+        e.preventDefault();
+
+        try{
+            if(!email || !password){
+                setError("Please filled all missing line.")
+                return;
+            }
+
+            const res = await signIn("credentials",{
+                email,password,redirect:false
+            });
+
+            if(res?.error){
+                setError("Wrong email or password")
+                return;
+            }
+
+            router.replace("/dashboard")
+        }catch(error:any){
+            return NextResponse.json({message:"Error " + error.message},{status:500})
+        }
+    }
     return (
         <>
             <section className="bg-gray-50 dark:bg-gray-900">
@@ -12,7 +44,7 @@ function login_page() {
                             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                                 Sign in to your account
                             </h1>
-                            <form className="space-y-4 md:space-y-6" action="#">
+                            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6" action="#">
                                 <div>
                                     <label
                                         htmlFor="email"
@@ -21,12 +53,13 @@ function login_page() {
                                         Your email
                                     </label>
                                     <input
+                                        onChange={(e) => setEmail(e.target.value)}
                                         type="email"
                                         name="email"
                                         id="email"
                                         className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         placeholder="name@company.com"
-                                        required
+                                        
                                     />
                                 </div>
                                 <div>
@@ -37,14 +70,21 @@ function login_page() {
                                         Password
                                     </label>
                                     <input
+                                        onChange={(e) => setPassword(e.target.value)}
                                         type="password"
                                         name="password"
                                         id="password"
                                         placeholder="••••••••"
                                         className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        required
+                                        
                                     />
                                 </div>
+                                {error && (
+                                <div className="bg-red-500 text-white rounded-lg p-2 justify-self-start">
+                                    {error}
+                                </div>
+                                )
+                                }
                                 
                                 <button
                                     type="submit"

@@ -53,7 +53,7 @@ export default function RegisterForm(){
 
             const form = e.target
             form.reset();
-            router.push("/")
+            router.push("/dashboard")
         }catch(error:any){
             console.log("Error ",error)
         }
